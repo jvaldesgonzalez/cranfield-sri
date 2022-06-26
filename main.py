@@ -21,13 +21,13 @@ items = dl.cranfield.parse_raw()
 
 vectorial_model = VectorialModel()
 
-# try:
-#     vectorial_model.load("./models_saves")
-# except:
-#     vectorial_model.add_data(items)
-#     vectorial_model.save("./models_saves")
+try:
+    vectorial_model.load("./models_saves")
+except:
+    vectorial_model.add_data(items)
+    vectorial_model.save("./models_saves")
 
-vectorial_model.add_data(items)
+# vectorial_model.add_data(items)
 # vectorial_model.save("./models_saves")
 
 
