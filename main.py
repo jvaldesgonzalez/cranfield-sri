@@ -1,25 +1,39 @@
 import threading
+from itsdangerous import exc
 
 from pipe import select
 
 import modules.data_loader as dl
 import modules.data_processor.normalizer as normalizer
 import modules.data_processor.tokenizer as tokenizer
+from modules.models.vectorial_model import VectorialModel
 from modules.web import run as run_web
 
 # parse dataset
 items = dl.cranfield.parse_raw()
 
-better_titles = list(
-    items
-    | select(lambda x: x.title)
-    | select(tokenizer.tokenize)
-    | select(normalizer.normalize)
-)
+# better_titles = list(
+#     items
+#     | select(lambda x: x.title)
+#     | select(tokenizer.tokenize)
+#     | select(normalizer.normalize)
+# )
 
-print(better_titles[:5])
-assert len(better_titles) == 1400
+vectorial_model = VectorialModel()
+
+try:
+    vectorial_model.load("./models_saves")
+except:
+    vectorial_model.add_data(items)
+    vectorial_model.save("./models_saves")
+
+
+vectorial_model.make_query("from the nose or leading edge of the body .  consequently, there exists an inviscid rotational flow region between the shock wave and the boundary")
+
+
+print("--------------------------------")
+# assert len(better_titles) == 1400
 
 
 # starting flask service as another thread
-threading.Thread(target=run_web.run).start()
+# threading.Thread(target=run_web.run).start()
