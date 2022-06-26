@@ -32,7 +32,7 @@ class CranItem(object):
 ID_marker = re.compile(r"\.I.")
 
 
-def parse_raw() -> list[CranItem]:
+def parse_raw():
     def get_data(PATH_TO_FILE: str):
         """
         Reads the file and splits the text into entries at the ID marker '.I'.
@@ -48,7 +48,7 @@ def parse_raw() -> list[CranItem]:
     # qry_list = get_data(PATH_TO_CRAN_QRY)
 
     chunk_start = re.compile(r"\.[ABTW]")
-    items: list[CranItem] = []
+    items = []
 
     for line in txt_list:
         entries = re.split(chunk_start, line)
