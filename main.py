@@ -1,5 +1,4 @@
 import threading
-from itsdangerous import exc
 
 from pipe import select
 
