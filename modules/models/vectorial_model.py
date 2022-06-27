@@ -12,6 +12,7 @@ class VectorialModel:
         self.terms = {}
         self.data_size = 0
         self.items = {}
+        self.feedback = {}
 
     def add_data(self, items: list):
         self.data_size = len(items)
@@ -56,6 +57,20 @@ class VectorialModel:
         normalized_query = normalizer.normalize(tokenizer.tokenize(query))
         query_vector = {}
 
+        # temp = []
+        # for w in normalized_query:
+        #     temp += self.get_nearest_words(w)
+        
+        # normalized_query = temp
+        
+        # temp = []
+        # for w in normalized_query:
+        #     _, term = self.get_nearest_word(w)
+        #     if term != "":
+        #         temp.append(term)
+        
+        # normalized_query = temp
+
         for w in normalized_query:
             if w not in self.terms:
                 continue
@@ -78,6 +93,9 @@ class VectorialModel:
                     rank[doc] += q_weight * d_weight
                 except KeyError:
                     rank[doc] = q_weight * d_weight
+                
+                if (term in self.feedback and doc in self.feedback[term]):
+                    rank[doc] += self.feedback[term][doc] * 0.3
 
         rank = [(doc, w) for doc, w in rank.items()]
         rank.sort(key=lambda x: x[1], reverse=True)
@@ -97,13 +115,15 @@ class VectorialModel:
         return result
 
     def get_nearest_word(self, word):
-        min = 100000
+        if word in self.terms:
+            return (0, word)
+        min = 3
         result = ""
         for term, _ in self.terms.items():
             dist = levenshtein(term, word)
             if dist < min:
                 dist = min
-                result = term
+                result = term            
         return (dist, result)
 
     def save(self, path):
@@ -112,7 +132,8 @@ class VectorialModel:
                 'alpha': self.alpha,
                 'recover_amount': self.recover_amount,
                 'terms': self.terms,
-                'data_size': self.data_size
+                'data_size': self.data_size,
+                'feedback' : self.feedback
             }))
 
             f.close()
@@ -123,4 +144,17 @@ class VectorialModel:
             self.alpha = data['alpha']
             self.recover_amount = data['recover_amount']
             self.terms = data['terms']
-            self.data_size = data['data_size']
+            self.data_size = data['data_size'],
+            self.feedback = data['feedback']
+
+    def incress_score(self, query, doc_id):
+        normalized_query = normalizer.normalize(tokenizer.tokenize(query))
+
+        for w in normalized_query:
+            if w in self.feedback:
+                try:
+                    self.feedback[w][doc_id] += 1
+                except KeyError:
+                    self.feedback[w][doc_id] = 1
+            else:
+                self.feedback[w] = {doc_id:1}
