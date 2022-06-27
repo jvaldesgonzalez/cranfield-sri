@@ -22,9 +22,11 @@ except:
     vectorial_model.add_data(items)
     vectorial_model.save("./models_saves")
 
+# vectorial_model.add_data(items)
+# vectorial_model.save("./models_saves")
 
 vectorial_model.make_query(
-    "from the nose or leading edge of the body .  consequently, there exists an inviscid rotational flow region between the shock wave and the boundary")
+    "what similarity laws must be obeyed when constructing aeroelastic models of heated high speed aircraft .")
 
 
 print("--------------------------------")

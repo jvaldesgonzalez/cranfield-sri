@@ -1,8 +1,8 @@
-import json
-import math
-
 import modules.data_processor.normalizer as normalizer
 import modules.data_processor.tokenizer as tokenizer
+from modules.utils.levenshtein import levenshtein
+import math
+import json
 
 
 class VectorialModel:
@@ -11,11 +11,13 @@ class VectorialModel:
         self.recover_amount = recover_amount
         self.terms = {}
         self.data_size = 0
+        self.items = {}
 
     def add_data(self, items: list):
         self.data_size = len(items)
         total_terms_by_id = {}
         for item in items:
+            self.items[item.id] = item
             normalized_title = normalizer.normalize(
                 tokenizer.tokenize(item.title))
             normalized_text = normalizer.normalize(
@@ -34,17 +36,11 @@ class VectorialModel:
             self.add(item.id, normalized_author)
             self.add(item.id, normalized_bib)
 
-        # total = len(self.terms)
-        # print(total)
-
-        for term, docs in self.terms.items():
+        for _, docs in self.terms.items():
             for doc, freq in docs.items():
                 tf = freq / total_terms_by_id[doc]
                 idf = math.log(len(items)/len(docs))
                 docs[doc] = (tf * idf)
-            # print(term)
-            # print(docs)
-            # print("+++++++++++++++++++++++++++++++++")
 
     def add(self, id, words):
         for w in words:
@@ -58,8 +54,8 @@ class VectorialModel:
 
     def make_query(self, query):
         normalized_query = normalizer.normalize(tokenizer.tokenize(query))
-
         query_vector = {}
+
         for w in normalized_query:
             if w not in self.terms:
                 continue
@@ -73,7 +69,7 @@ class VectorialModel:
                 continue
             tf = freq / len(normalized_query)
             idf = math.log(self.data_size/len(self.terms[w]))
-            query_vector[w] = (self.alpha + (1 - self.alpha)) * (tf * idf)
+            query_vector[w] = (self.alpha + ((1 - self.alpha)) * tf) * idf
 
         rank = {}
         for term, q_weight in query_vector.items():
@@ -90,6 +86,25 @@ class VectorialModel:
 
         print(rank)
         return list(map(lambda x: x[0], rank))
+
+    def get_nearest_words(self, word):
+
+        result = []
+        for term, _ in self.terms.items():
+            dist = levenshtein(term, word)
+            if dist < 3:
+                result.append(term)
+        return result
+
+    def get_nearest_word(self, word):
+        min = 100000
+        result = ""
+        for term, _ in self.terms.items():
+            dist = levenshtein(term, word)
+            if dist < min:
+                dist = min
+                result = term
+        return (dist, result)
 
     def save(self, path):
         with open(f'{path}/data_from_vectorial_model.json', 'w+') as f:
