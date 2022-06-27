@@ -1,8 +1,9 @@
-from itsdangerous import exc
+import json
+import math
+
 import modules.data_processor.normalizer as normalizer
 import modules.data_processor.tokenizer as tokenizer
-import math
-import json
+
 
 class VectorialModel:
     def __init__(self, alpha=0.5, recover_amount=10):
@@ -10,23 +11,23 @@ class VectorialModel:
         self.recover_amount = recover_amount
         self.terms = {}
         self.data_size = 0
-        
-        
 
-    
-    def add_data(self, items:list):
+    def add_data(self, items: list):
         self.data_size = len(items)
         total_terms_by_id = {}
         for item in items:
-            normalized_title = normalizer.normalize(tokenizer.tokenize(item.title))
-            normalized_text = normalizer.normalize(tokenizer.tokenize(item.text))
-            normalized_author = normalizer.normalize(tokenizer.tokenize(item.author))
+            normalized_title = normalizer.normalize(
+                tokenizer.tokenize(item.title))
+            normalized_text = normalizer.normalize(
+                tokenizer.tokenize(item.text))
+            normalized_author = normalizer.normalize(
+                tokenizer.tokenize(item.author))
             normalized_bib = normalizer.normalize(tokenizer.tokenize(item.bib))
 
             total_terms_by_id[item.id] = (len(normalized_title) +
-                                            len(normalized_text) +
-                                            len(normalized_author) +
-                                            len(normalized_bib))
+                                          len(normalized_text) +
+                                          len(normalized_author) +
+                                          len(normalized_bib))
 
             self.add(item.id, normalized_title)
             self.add(item.id, normalized_text)
@@ -45,7 +46,6 @@ class VectorialModel:
             # print(docs)
             # print("+++++++++++++++++++++++++++++++++")
 
-
     def add(self, id, words):
         for w in words:
             if w in (self.terms):
@@ -54,12 +54,11 @@ class VectorialModel:
                 except KeyError:
                     self.terms[w][id] = 1
             else:
-                self.terms[w] = {id:1}
-
+                self.terms[w] = {id: 1}
 
     def make_query(self, query):
         normalized_query = normalizer.normalize(tokenizer.tokenize(query))
-        
+
         query_vector = {}
         for w in normalized_query:
             if w not in self.terms:
@@ -68,14 +67,14 @@ class VectorialModel:
                 query_vector[w] += 1
             except KeyError:
                 query_vector[w] = 1
-        
+
         for w, freq in query_vector.items():
             if w not in self.terms:
                 continue
             tf = freq / len(normalized_query)
             idf = math.log(self.data_size/len(self.terms[w]))
             query_vector[w] = (self.alpha + (1 - self.alpha)) * (tf * idf)
-        
+
         rank = {}
         for term, q_weight in query_vector.items():
             for doc, d_weight in self.terms[term].items():
@@ -90,6 +89,7 @@ class VectorialModel:
         rank = rank[: self.recover_amount]
 
         print(rank)
+        return list(map(lambda x: x[0], rank))
 
     def save(self, path):
         with open(f'{path}/data_from_vectorial_model.json', 'w+') as f:
