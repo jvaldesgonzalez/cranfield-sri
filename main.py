@@ -1,6 +1,7 @@
 import threading
 
 import modules.data_loader as dl
+from modules.models.bm25_model import SmartModel
 from modules.models.vectorial_model import VectorialModel
 from modules.web import run as run_web
 
@@ -27,6 +28,31 @@ except:
 
 vectorial_model.make_query(
     "what similarity laws must be obeyed when constructing aeroelastic models of heated high speed aircraft .")
+
+smart_model = SmartModel()
+try:
+    smart_model.load()
+except:
+    smart_model.fit(items)
+    smart_model.train()
+    smart_model.save()
+
+smart_model.make_query(
+    "what similarity laws must be obeyed when constructing aeroelastic models of heated high speed aircraft .")
+
+# with plt.xkcd():
+#     pd.DataFrame(
+#         smart_model.ft_model.wv.most_similar('flow theory',
+#                                              topn=10,
+#                                              restrict_vocab=5000
+#                                              ),
+#         columns=['Word', 'Score']
+#     ).plot.barh(
+#         x='Word',
+#         figsize=(6, 6),
+#         color=(0.3, 0.7, 0.7)
+#     )
+#     plt.show()
 
 
 print("--------------------------------")

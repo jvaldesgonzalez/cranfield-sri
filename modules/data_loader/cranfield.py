@@ -21,7 +21,7 @@ class CranItem(object):
 
     @property
     def fulltext(self):
-        return self.title + " " + self.text
+        return ' '.join([self.title, self.text, self.author, self.bib])
 
     def __str__(self):
         return f"{self.title}"

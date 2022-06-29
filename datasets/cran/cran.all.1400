@@ -13453,6 +13453,7 @@ necessary to obtain more correct
 results have been discussed .
 .I 471
 .T
+waves in supersonic flow .
 .A
 .B
 .W
@@ -27688,6 +27689,9 @@ reduced by retrorocket operation below the drag for a jet-off condition,
 numbers and retrorocket thrust coefficients investigated .
 .I 995
 .T
+extension of boundary layer separation criteria to
+a m=6 .5 utilizing flat plates with forward-facing
+steps .
 .A
 .B
 .W

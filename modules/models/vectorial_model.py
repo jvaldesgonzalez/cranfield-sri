@@ -88,7 +88,6 @@ class VectorialModel:
         return list(map(lambda x: x[0], rank))
 
     def get_nearest_words(self, word):
-
         result = []
         for term, _ in self.terms.items():
             dist = levenshtein(term, word)
