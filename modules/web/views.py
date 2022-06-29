@@ -27,20 +27,20 @@ except:
 @app.route('/', methods=['GET'])
 def home():
     q = request.args.get('search', '')
+    model = request.args.get('model', 'vec')
 
     v_result_indices = vectorial_model.make_query(q)
     v_results = list(chain(*[list(filter(lambda x: x.id == id, items))
                              for id in v_result_indices]))
-    print(v_results[:3])
     v_amount = len(v_result_indices)
 
     bm_result_indices = smart_model.make_query(q)
-    print(bm_result_indices[0])
     bm_results = [items[i] for i in bm_result_indices[0]]
     bm_amount = len(bm_results)
 
     return render_template('index.html.jinja', context={
         'q': q,
-        'results': bm_results,
-        "amount": bm_amount
+        'results': bm_results if model == 'bm25' else v_results,
+        "amount": bm_amount if model == 'bm25' else v_amount,
+        "model_used": 'bm25' if model == 'bm25' else 'vectorial'
     })
