@@ -17,22 +17,32 @@ items = dl.cranfield.parse_raw()
 # )
 
 vectorial_model = VectorialModel()
-
-if (len(sys.argv) > 1 and sys.argv[1] == "1"):
-    vectorial_model.add_data(items)
-    vectorial_model.save("./models_saves")
-
-
 smart_model = SmartModel()
-try:
-    smart_model.load()
-except:
-    smart_model.fit(items)
-    smart_model.train()
-    smart_model.save()
 
-smart_model.make_query(
-    "what similarity laws must be obeyed when constructing aeroelastic models of heated high speed aircraft .")
+if (len(sys.argv) == 3):
+    if(sys.argv[1] == "1"):
+        vectorial_model.add_data(items)
+        vectorial_model.save("./models_saves")
+    if(sys.argv[2] == "1"):
+        smart_model.fit(items)
+        smart_model.train()
+        smart_model.save()
+
+else:
+    raise ValueError('You most enter two arguments. Value 1 in each will re-calculate the vectorial and bm25 models respectively')
+    
+
+
+# smart_model = SmartModel()
+# try:
+#     smart_model.load()
+# except:
+#     smart_model.fit(items)
+#     smart_model.train()
+#     smart_model.save()
+
+# smart_model.make_query(
+#     "what similarity laws must be obeyed when constructing aeroelastic models of heated high speed aircraft .")
 
 # with plt.xkcd():
 #     pd.DataFrame(
