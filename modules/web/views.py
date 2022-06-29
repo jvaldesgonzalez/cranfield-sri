@@ -13,7 +13,8 @@ vectorial_model = VectorialModel()
 try:
     vectorial_model.load("./models_saves")
 except:
-    raise Exception('Models not loaded')
+    vectorial_model.add_data(items)
+    vectorial_model.save("./models_saves")
 
 smart_model = SmartModel()
 try:
