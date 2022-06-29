@@ -4,6 +4,7 @@ import modules.data_loader as dl
 from modules.models.bm25_model import SmartModel
 from modules.models.vectorial_model import VectorialModel
 from modules.web import run as run_web
+import sys
 
 # parse dataset
 items = dl.cranfield.parse_raw()
@@ -17,17 +18,10 @@ items = dl.cranfield.parse_raw()
 
 vectorial_model = VectorialModel()
 
-try:
-    vectorial_model.load("./models_saves")
-except:
+if (len(sys.argv) > 1 and sys.argv[1] == "1"):
     vectorial_model.add_data(items)
     vectorial_model.save("./models_saves")
 
-# vectorial_model.add_data(items)
-# vectorial_model.save("./models_saves")
-
-vectorial_model.make_query(
-    "what similarity laws must be obeyed when constructing aeroelastic models of heated high speed aircraft .")
 
 smart_model = SmartModel()
 try:
