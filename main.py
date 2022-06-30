@@ -8,6 +8,8 @@ import sys
 
 # parse dataset
 items = dl.cranfield.parse_raw()
+querys = dl.cranfield.parse_raw_query()
+print(querys)
 
 # better_titles = list(
 #     items
@@ -29,8 +31,8 @@ if (len(sys.argv) == 3):
         smart_model.save()
 
 else:
-    raise ValueError('You most enter two arguments. Value 1 in each will re-calculate the vectorial and bm25 models respectively')
-    
+    raise ValueError(
+        'You most enter two arguments. Value 1 in each will re-calculate the vectorial and bm25 models respectively')
 
 
 # smart_model = SmartModel()
