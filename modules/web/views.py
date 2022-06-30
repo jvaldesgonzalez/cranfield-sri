@@ -27,7 +27,7 @@ except:
 
 @app.route('/', methods=['GET'])
 def home():
-    q = request.args.get('search', '')
+    q = request.args.get('search', 'ariplane')
     model = request.args.get('model', 'vec')
 
     v_result_indices = vectorial_model.make_query(q)

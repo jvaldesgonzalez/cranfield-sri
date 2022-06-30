@@ -60,15 +60,15 @@ class VectorialModel:
         # temp = []
         # for w in normalized_query:
         #     temp += self.get_nearest_words(w)
-        
+
         # normalized_query = temp
-        
+
         # temp = []
         # for w in normalized_query:
         #     _, term = self.get_nearest_word(w)
         #     if term != "":
         #         temp.append(term)
-        
+
         # normalized_query = temp
 
         for w in normalized_query:
@@ -83,7 +83,11 @@ class VectorialModel:
             if w not in self.terms:
                 continue
             tf = freq / len(normalized_query)
-            idf = math.log(self.data_size/len(self.terms[w]))
+            print('data_size', self.data_size)
+            try:
+                idf = math.log(self.data_size[0]/len(self.terms[w]))
+            except:
+                idf = math.log((self.data_size)/len(self.terms[w]))
             query_vector[w] = (self.alpha + ((1 - self.alpha)) * tf) * idf
 
         rank = {}
@@ -93,7 +97,7 @@ class VectorialModel:
                     rank[doc] += q_weight * d_weight
                 except KeyError:
                     rank[doc] = q_weight * d_weight
-                
+
                 if (term in self.feedback and doc in self.feedback[term]):
                     rank[doc] += self.feedback[term][doc] * 0.3
 
@@ -122,7 +126,7 @@ class VectorialModel:
             dist = levenshtein(term, word)
             if dist < min:
                 dist = min
-                result = term            
+                result = term
         return (dist, result)
 
     def save(self, path):
@@ -132,7 +136,7 @@ class VectorialModel:
                 'recover_amount': self.recover_amount,
                 'terms': self.terms,
                 'data_size': self.data_size,
-                'feedback' : self.feedback
+                'feedback': self.feedback
             }))
 
             f.close()
@@ -156,4 +160,4 @@ class VectorialModel:
                 except KeyError:
                     self.feedback[w][doc_id] = 1
             else:
-                self.feedback[w] = {doc_id:1}
+                self.feedback[w] = {doc_id: 1}

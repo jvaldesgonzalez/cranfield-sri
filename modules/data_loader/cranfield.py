@@ -45,7 +45,7 @@ def parse_raw():
         return lines
 
     txt_list = get_data(PATH_TO_CRAN_TXT)
-    # qry_list = get_data(PATH_TO_CRAN_QRY)
+    qry_list = get_data(PATH_TO_CRAN_QRY)
 
     chunk_start = re.compile(r"\.[ABTW]")
     items = []
@@ -58,4 +58,30 @@ def parse_raw():
                               author=author, bib=bib, text=text))
 
     assert len(items) == 1400
+    return items
+
+
+def parse_raw_query():
+    def get_data(PATH_TO_FILE: str):
+        """
+        Reads the file and splits the text into entries at the ID marker '.I'.
+        The first entry is empty, so it is removed.
+        """
+        with open(PATH_TO_FILE, 'r') as f:
+            text = f.read().replace('\n', " ")
+            lines = re.split(ID_marker, text)
+            lines.pop(0)
+        return lines
+
+    txt_list = get_data(PATH_TO_CRAN_TXT)
+    qry_list = get_data(PATH_TO_CRAN_QRY)
+
+    chunk_start = re.compile(r"\.[W]")
+    items = []
+
+    for line in qry_list:
+        entries = re.split(chunk_start, line)
+        id = entries[0].strip()
+        query = entries[1]
+        items.append((int(id), query))
     return items
